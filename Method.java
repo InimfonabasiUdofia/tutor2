@@ -4,12 +4,12 @@ import java.util.LinkedList;
 public class Method {
 
     /**
-     * @param
-     * console calculator that obeys rule of BODMAS
-     * 
+     * @param console calculator that obeys rule of BODMAS
+     *
      */
-    
     public LinkedList<Double> calculate(String expression) {
+
+        CalCompute calCompute = new CalCompute();
 
         LinkedList<Double> List_operand = new LinkedList<>();
         LinkedList<String> List_operator = new LinkedList<>();
@@ -17,91 +17,42 @@ public class Method {
 
         /* * 
         * Split the expression into operands and operators
-        * then store them in a seperate array
-        */
-        String[] operands = expression.split("[+\\-*/^%]");
-        String[] operator = expression.trim().replaceAll("^[0-9.]+", "").split("[0-9.\\s]+");
-
-
-        /* *
-        * use a for loop to store the array operands and operators
-        * in a seperate linkedlist
-        */
-        for (int i = 0; i < operands.length; i++) {
-            List_operand.add(Double.parseDouble(operands[i]));
-        }
-        for (int i = 0; i < operator.length; i++) {
-            List_operator.add(operator[i]);
-        }
-
-
-        /**
-         *  Resolve all division and multiplication  operations from left to right.
-         * Iterates through the operator list and finds / and * operators,
-         * computes the result, and updates both lists accordingly .
+        * then store them in a seperate array*
          */
-        for (int i = 0; i < List_operator.size(); i++) {
-            if (List_operator.get(i).equals("/") ||List_operator.get(i).equals("*")) {
-                double left = List_operand.get(i);
-                double right = List_operand.get(i + 1);
-                double result;
-                if (List_operator.get(i).equals("/")){
-                     result = left / right;
-                }else{
-                     result = left * right;
-                }
-
-                List_operand.remove(i + 1);
-                List_operand.remove(i);
-                List_operand.add(i, result);
-
-                List_operator.remove(i);
-                i--;
-                
+        String[] operands = expression.replaceAll("[()]", "").split("[+\\-*/]");
+        for (String operand : operands) {
+            String trimmed = operand.trim();
+            if (!trimmed.isEmpty()) {
+                List_operand.add(Double.parseDouble(trimmed));
             }
         }
 
-
-        
-      
-
-
-        
-        /**
-         *  Resolve all addition and subtraction operations first from left to right.
-         * Iterates through the operator list and finds + and - operators,
-         * computes the result, and updates both lists accordingly.
-         */
-        for (int i = 0; i < List_operator.size(); i++) {
-            if (List_operator.get(i).equals("+") || List_operator.get(i).equals("-")) {
-                double left = List_operand.get(i);
-                double right = List_operand.get(i + 1);
-                double result ;
-                if(List_operator.get(i).equals("+")){
-                    result = left + right;
-                }else{
-                    result = left - right;
-                }
-
-                List_operand.remove(i + 1);
-                List_operand.remove(i);
-                List_operand.add(i, result);
-
-                List_operator.remove(i);
-                i--;
-                
+        for (char c : expression.toCharArray()) {
+            if (c == '+' || c == '-' || c == '*' || c == '/' || c == '(' || c == ')') {
+                List_operator.add(String.valueOf(c));
             }
         }
 
-
-           
-      
+        /**
+         * Resolve all division and multiplication operations from left to
+         * right. Iterates through the operator list and finds / and *
+         * operators, computes the result, and updates both lists accordingly .
+         *
+         */
+        calCompute.bracket(List_operator, List_operand);
+        calCompute.compute("/", "*", List_operator, List_operand);
 
         /**
-         * @return
-         * returns value of linkedlinked list in double
+         * Resolve all addition and subtraction operations first from left to
+         * right. Iterates through the operator list and finds + and -
+         * operators, computes the result, and updates both lists accordingly.
          */
-        return List_operand ;
+        calCompute.compute("+", "-", List_operator, List_operand);
+
+        /**
+         * @return returns value of linkedlinked list in double
+         */
+        return List_operand;
 
     }
 }
